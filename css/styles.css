@@ -1,0 +1,358 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header and Navigation */
+header {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.logo h1 {
+    color: #003d5c;
+    font-size: 1.5rem;
+}
+
+.logo h1 a {
+    color: #003d5c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo h1 a:hover {
+    color: #663399;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a:hover {
+    color: #663399;
+}
+
+/* Main content */
+main {
+    margin-top: 70px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hero section */
+.hero {
+    background: linear-gradient(135deg, #003d5c 0%, #663399 100%);
+    color: white;
+    padding: 50px 0;
+    text-align: center;
+}
+
+.hero-content h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 300;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+}
+
+.cta-button {
+    display: inline-block;
+    background: #004466;
+    color: white;
+    padding: 15px 30px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.cta-button:hover {
+    background: #7744aa;
+}
+
+/* Sections */
+section {
+    padding: 60px 0;
+}
+
+section.about {
+    padding: 50px 0;
+}
+
+section.professional-bio {
+    padding: 50px 0;
+}
+
+.about {
+    background: #f8f9fa;
+}
+
+.experience {
+    background: white;
+}
+
+.professional-bio {
+    background: white;
+}
+
+.bio-content p {
+    text-align: justify;
+    margin-bottom: 24px;
+    line-height: 1.7;
+    font-size: 1.1rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    color: #444;
+    padding: 0 20px;
+}
+
+.contact {
+    background: #f8f9fa;
+}
+
+/* Contact page specific styles */
+.contact-info {
+    max-width: 900px;
+    margin: 40px auto 0;
+    padding: 0 20px;
+}
+
+.contact-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+    gap: 20px;
+}
+
+.contact-row:last-child {
+    border-bottom: none;
+}
+
+.contact-label {
+    flex: 0 0 100px;
+    font-weight: 600;
+    color: #003d5c;
+    font-size: 1.1rem;
+}
+
+.contact-value {
+    flex: 0 0 200px;
+    color: #666;
+    font-size: 1rem;
+}
+
+.contact-value a {
+    color: #003d5c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-value a:hover {
+    color: #663399;
+    text-decoration: underline;
+}
+
+.contact-description {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+/* About page layout */
+.about-content {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(20px, 3vw, 30px);
+    margin-top: 50px;
+    padding: 0 20px;
+}
+
+.about-image {
+    flex: 0 0 250px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.profile-image {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    border: 3px solid #dee2e6;
+}
+
+.about-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.about-text p {
+    text-align: left;
+    margin-bottom: 24px;
+    line-height: 1.7;
+    font-size: clamp(1rem, 1.1vw, 1.1rem);
+    color: #444;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+    .about-content {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        padding: 0 10px;
+    }
+    
+    .about-image {
+        flex: none;
+    }
+    
+    .about-text p {
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-content {
+        gap: 20px;
+    }
+    
+    .profile-image {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .contact-row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 0;
+        gap: 10px;
+    }
+    
+    .contact-label {
+        margin-bottom: 5px;
+        flex: none;
+    }
+    
+    .contact-value {
+        flex: none;
+    }
+    
+    .contact-description {
+        flex: none;
+    }
+}
+
+section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #003d5c;
+}
+
+section p {
+    font-size: 1.1rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    color: #666;
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, #003d5c 0%, #663399 100%);
+    color: white;
+    text-align: center;
+    padding: 30px 0;
+    margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 15px 20px;
+    }
+    
+    .nav-menu {
+        margin-top: 15px;
+        gap: 20px;
+    }
+    
+    main {
+        margin-top: 120px;
+    }
+    
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    section {
+        padding: 60px 0;
+    }
+    
+    section h2 {
+        font-size: 2rem;
+    }
+}

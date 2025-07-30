@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact Ge Lyu - Get in touch">
+    <meta name="author" content="Ge Lyu">
+    <title>Contact - Ge Lyu</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Placeholder for the shared header -->
+    <div id="header-placeholder"></div>
+
+    <!-- JavaScript to load the shared header -->
+    <script>
+        fetch('shared/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading header:', error));
+    </script>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Get In Touch</h2>
+            </div>
+        </section>
+
+        <section class="contact" style="flex: 1;">
+            <div class="container">                
+                <div class="contact-info">
+                    <div class="contact-row">
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value">
+                            <a href="mailto:iamgelyu@gmail.com">iamgelyu@gmail.com</a>
+                        </div>
+                        <div class="contact-description">
+                            Got work? A new area to explore?<br>
+                            Feel like a drink? Whiskey on the rocks.<br>
+                            Coffee break? Black coffee. Nothing else.<br>
+                            For any of the above — shoot me an email.
+                        </div>
+                    </div>
+                    
+                    <div class="contact-row">
+                        <div class="contact-label">Location</div>
+                        <div class="contact-value">
+                            San Francisco Bay Area, CA
+                        </div>
+                        <div class="contact-description">
+                            Meet me randomly on the street in the San Francisco Bay Area.<br>
+                            Chances are I am nearby — out on a trail, at a campsite, or near an airport with a camera in hand.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Placeholder for the shared footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JavaScript to load the shared footer -->
+    <script>
+        fetch('shared/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading footer:', error));
+    </script>
+</body>
+</html>
