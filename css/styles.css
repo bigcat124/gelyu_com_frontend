@@ -9,6 +9,10 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     line-height: 1.6;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
 }
 
 .container {
@@ -62,13 +66,16 @@ header {
 /* Main content */
 main {
     margin-top: 70px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Hero section */
 .hero {
     background: linear-gradient(135deg, #003d5c 0%, #663399 100%);
     color: white;
-    padding: 100px 0;
+    padding: 50px 0;
     text-align: center;
 }
 
@@ -110,12 +117,113 @@ section {
     background: #f8f9fa;
 }
 
-.projects {
+.experience {
     background: white;
 }
 
 .contact {
     background: #f8f9fa;
+}
+
+/* Contact page specific styles */
+.contact-info {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.contact-item {
+    text-align: center;
+    margin: 20px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.contact-item h3 {
+    color: #003d5c;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+.contact-item p {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* About page layout */
+.about-content {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(20px, 4vw, 40px);
+    margin-top: 40px;
+}
+
+.about-image {
+    flex: 0 0 clamp(250px, 25vw, 350px);
+    min-width: 200px;
+}
+
+.profile-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    border: 2px solid #dee2e6;
+}
+
+.about-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.about-text p {
+    text-align: left;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    font-size: clamp(1rem, 1.1vw, 1.1rem);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+    .about-content {
+        gap: 30px;
+    }
+    
+    .about-image {
+        flex: 0 0 clamp(200px, 30vw, 280px);
+    }
+}
+
+@media (max-width: 768px) {
+    .about-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    .about-image {
+        flex: none;
+        width: clamp(250px, 60vw, 350px);
+        max-width: 100%;
+    }
+    
+    .about-text p {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-content {
+        gap: 20px;
+    }
+    
+    .about-image {
+        width: 90vw;
+        max-width: 300px;
+    }
 }
 
 section h2 {
@@ -139,6 +247,7 @@ footer {
     color: white;
     text-align: center;
     padding: 30px 0;
+    margin-top: auto;
 }
 
 /* Responsive design */
