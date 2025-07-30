@@ -9,19 +9,18 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="nav-container">
-                <div class="logo">
-                    <h1><a href="index.html">Ge Lyu</a></h1>
-                </div>
-                <ul class="nav-menu">
-                    <li><a href="about.html">About Me</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-        </nav>
-    </header>
+    <!-- Placeholder for the shared header -->
+    <div id="header-placeholder"></div>
+
+    <!-- JavaScript to load the shared header -->
+    <script>
+        fetch('shared/header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading header:', error));
+    </script>
 
     <main>
         <section class="hero">
