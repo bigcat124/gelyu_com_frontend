@@ -161,15 +161,17 @@ section.professional-bio {
 
 /* Contact page specific styles */
 .contact-info {
-    max-width: 600px;
+    max-width: 900px;
     margin: 40px auto 0;
+    padding: 0 20px;
 }
 
 .contact-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 20px 0;
     border-bottom: 1px solid #eee;
+    gap: 20px;
 }
 
 .contact-row:last-child {
@@ -177,14 +179,14 @@ section.professional-bio {
 }
 
 .contact-label {
-    flex: 0 0 150px;
+    flex: 0 0 100px;
     font-weight: 600;
     color: #003d5c;
     font-size: 1.1rem;
 }
 
 .contact-value {
-    flex: 1;
+    flex: 0 0 200px;
     color: #666;
     font-size: 1rem;
 }
@@ -198,6 +200,14 @@ section.professional-bio {
 .contact-value a:hover {
     color: #663399;
     text-decoration: underline;
+}
+
+.contact-description {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #888;
+    font-style: italic;
+    line-height: 1.4;
 }
 
 /* About page layout */
@@ -276,10 +286,19 @@ section.professional-bio {
         flex-direction: column;
         align-items: flex-start;
         padding: 15px 0;
+        gap: 10px;
     }
     
     .contact-label {
         margin-bottom: 5px;
+        flex: none;
+    }
+    
+    .contact-value {
+        flex: none;
+    }
+    
+    .contact-description {
         flex: none;
     }
 }
