@@ -46,6 +46,16 @@ header {
     font-size: 1.5rem;
 }
 
+.logo h1 a {
+    color: #003d5c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.logo h1 a:hover {
+    color: #663399;
+}
+
 .nav-menu {
     display: flex;
     list-style: none;
@@ -151,28 +161,43 @@ section.professional-bio {
 
 /* Contact page specific styles */
 .contact-info {
+    max-width: 600px;
+    margin: 40px auto 0;
+}
+
+.contact-row {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-top: 40px;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
 }
 
-.contact-item {
-    text-align: center;
-    margin: 20px;
-    flex: 1;
-    min-width: 200px;
+.contact-row:last-child {
+    border-bottom: none;
 }
 
-.contact-item h3 {
+.contact-label {
+    flex: 0 0 150px;
+    font-weight: 600;
     color: #003d5c;
-    margin-bottom: 10px;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
 }
 
-.contact-item p {
+.contact-value {
+    flex: 1;
     color: #666;
     font-size: 1rem;
+}
+
+.contact-value a {
+    color: #003d5c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-value a:hover {
+    color: #663399;
+    text-decoration: underline;
 }
 
 /* About page layout */
@@ -245,6 +270,17 @@ section.professional-bio {
     .profile-image {
         width: 200px;
         height: 200px;
+    }
+    
+    .contact-row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 0;
+    }
+    
+    .contact-label {
+        margin-bottom: 5px;
+        flex: none;
     }
 }
 
