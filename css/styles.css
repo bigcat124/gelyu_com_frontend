@@ -121,6 +121,20 @@ section {
     background: white;
 }
 
+.professional-bio {
+    background: white;
+}
+
+.bio-content p {
+    text-align: left;
+    margin-bottom: 20px;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .contact {
     background: #f8f9fa;
 }
@@ -160,18 +174,19 @@ section {
 }
 
 .about-image {
-    flex: 0 0 clamp(250px, 25vw, 350px);
-    min-width: 200px;
+    flex: 0 0 250px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .profile-image {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3/4;
+    width: 250px;
+    height: 250px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 50%;
     background-color: #e9ecef;
-    border: 2px solid #dee2e6;
+    border: 3px solid #dee2e6;
 }
 
 .about-text {
@@ -191,10 +206,6 @@ section {
     .about-content {
         gap: 30px;
     }
-    
-    .about-image {
-        flex: 0 0 clamp(200px, 30vw, 280px);
-    }
 }
 
 @media (max-width: 768px) {
@@ -206,8 +217,6 @@ section {
     
     .about-image {
         flex: none;
-        width: clamp(250px, 60vw, 350px);
-        max-width: 100%;
     }
     
     .about-text p {
@@ -220,9 +229,9 @@ section {
         gap: 20px;
     }
     
-    .about-image {
-        width: 90vw;
-        max-width: 300px;
+    .profile-image {
+        width: 200px;
+        height: 200px;
     }
 }
 
