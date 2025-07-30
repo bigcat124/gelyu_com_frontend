@@ -27,15 +27,11 @@
         <section class="hero">
             <div class="hero-content">
                 <h2>Get In Touch</h2>
-                <p>Let's connect and discuss opportunities</p>
             </div>
         </section>
 
         <section class="contact" style="flex: 1;">
-            <div class="container">
-                <h2>Contact Information</h2>
-                <p>Feel free to reach out to me through any of the following channels.</p>
-                
+            <div class="container">                
                 <div class="contact-info">
                     <div class="contact-item">
                         <h3>Email</h3>
@@ -43,23 +39,25 @@
                     </div>
                     
                     <div class="contact-item">
-                        <h3>LinkedIn</h3>
-                        <p>Add your LinkedIn profile</p>
-                    </div>
-                    
-                    <div class="contact-item">
                         <h3>Location</h3>
-                        <p>San Francisco, CA</p>
+                        <p>San Francisco Bay Area, CA</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Ge Lyu. All rights reserved.</p>
-        </div>
-    </footer>
+    <!-- Placeholder for the shared footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JavaScript to load the shared footer -->
+    <script>
+        fetch('shared/footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+            })
+            .catch(error => console.error('Error loading footer:', error));
+    </script>
 </body>
 </html>
