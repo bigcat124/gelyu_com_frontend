@@ -25,7 +25,7 @@ async function checkVaultAccess() {
     }
 
     try {
-        var response = await fetch("/api/vault/access", {
+        var response = await fetch(API_BASE + "/api/vault/access", {
             headers: { "Authorization": "Bearer " + token },
         });
 

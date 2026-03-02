@@ -7,3 +7,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+// API base URL: use backend directly on localhost, relative path in production
+var API_BASE = window.location.hostname === "localhost" ? "http://localhost:8080" : "";

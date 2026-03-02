@@ -14,7 +14,8 @@ def get_settings() -> Settings:
 def init_firebase():
     """Initialize Firebase Admin SDK using Application Default Credentials."""
     if not firebase_admin._apps:
-        firebase_admin.initialize_app()
+        settings = get_settings()
+        firebase_admin.initialize_app(options={"projectId": settings.gcp_project_id})
 
 
 def get_firestore_client():

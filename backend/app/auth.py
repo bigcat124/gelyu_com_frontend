@@ -1,7 +1,11 @@
+import logging
+
 from fastapi import Depends, HTTPException, Request
 from firebase_admin import auth as firebase_auth, firestore
 
 from app.dependencies import init_firebase, get_firestore_client
+
+logger = logging.getLogger(__name__)
 
 
 class AuthenticatedUser:
@@ -26,7 +30,8 @@ async def get_current_user(request: Request) -> AuthenticatedUser:
 
     try:
         decoded_token = firebase_auth.verify_id_token(token)
-    except Exception:
+    except Exception as e:
+        logger.error("Token verification failed: %s", e)
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     return AuthenticatedUser(
