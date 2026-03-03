@@ -42,12 +42,23 @@ function initAuthUI() {
         if (!authContainer) return;
 
         if (user) {
-            authContainer.innerHTML =
-                '<span class="auth-email">' + user.email + '</span>' +
-                '<button class="auth-btn" onclick="signOut()">Sign Out</button>';
+            authContainer.textContent = "";
+            var emailSpan = document.createElement("span");
+            emailSpan.className = "auth-email";
+            emailSpan.textContent = user.email;
+            var btn = document.createElement("button");
+            btn.className = "auth-btn";
+            btn.textContent = "Sign Out";
+            btn.onclick = signOut;
+            authContainer.appendChild(emailSpan);
+            authContainer.appendChild(btn);
         } else {
-            authContainer.innerHTML =
-                '<button class="auth-btn" onclick="signInWithGoogle()">Sign In</button>';
+            authContainer.textContent = "";
+            var btn = document.createElement("button");
+            btn.className = "auth-btn";
+            btn.textContent = "Sign In";
+            btn.onclick = signInWithGoogle;
+            authContainer.appendChild(btn);
         }
     });
 }

@@ -46,13 +46,17 @@ async function checkVaultAccess() {
 
         var data = await response.json();
         var grantedEl = document.getElementById("vault-granted");
-        grantedEl.innerHTML =
-            "<h3>Welcome, " + data.email + "</h3>" +
-            "<p>" + data.content + "</p>";
+        grantedEl.textContent = "";
+        var h3 = document.createElement("h3");
+        h3.textContent = "Welcome, " + data.email;
+        var p = document.createElement("p");
+        p.textContent = data.content;
+        grantedEl.appendChild(h3);
+        grantedEl.appendChild(p);
         showVaultState("vault-granted");
 
     } catch (error) {
-        console.error("Vault access check failed:", error);
+        console.error("Vault access check failed");
         showVaultState("vault-denied");
     }
 }
