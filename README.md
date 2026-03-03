@@ -131,6 +131,15 @@ make clean     # Removes the conda environment
 | `make install` | Install backend dependencies into the conda environment |
 | `make clean` | Remove the conda environment |
 | `make run` | Run the backend locally with uvicorn (auto-reload) |
+| `make deploy-backend` | Build container and deploy backend to Cloud Run |
+| `make deploy-frontend` | Deploy frontend to Firebase Hosting |
+| `make deploy` | Deploy both (backend first, then frontend) |
+| `make disable-backend` | Disable backend (zero traffic to Cloud Run) |
+| `make disable-frontend` | Disable frontend (replace site with maintenance page) |
+| `make disable` | Disable both backend and frontend |
+| `make enable-backend` | Re-enable backend (restore traffic to latest revision) |
+| `make enable-frontend` | Re-enable frontend (redeploy from `frontend/`) |
+| `make enable` | Re-enable both |
 
 ## Deployment
 
@@ -165,6 +174,15 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
     --member="serviceAccount:${SA}" \
     --role="roles/firebase.sdkAdminServiceAgent"
+
+# 4. Grant Cloud Build permission to push images and write logs
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SA}" \
+    --role="roles/artifactregistry.writer"
+
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+    --member="serviceAccount:${SA}" \
+    --role="roles/logging.logWriter"
 ```
 
 ### One-Time Firebase Setup
@@ -174,60 +192,71 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
    - Document ID: `iamgelyu@gmail.com` (your email)
    - Field `status`: `"active"` (string)
 3. **Get Web API Key**: Firebase Console > Project Settings > General > Web API Key → update `frontend/js/firebase-init.js`
+4. **Authorize custom domains for Auth**: Firebase Console > Authentication > Settings > Authorized domains > Add `www.gelyu.com` and `gelyu.com`
+5. **Add OAuth redirect URI**: Google Cloud Console > APIs & Services > Credentials > Edit the Web OAuth 2.0 Client ID > Add `https://www.gelyu.com/__/auth/handler` to Authorized redirect URIs
 
-### Deploy Backend (Cloud Run)
-
-```bash
-PROJECT_ID="project-c243fac2-f8de-4142-8aa"
-IMAGE="us-west1-docker.pkg.dev/${PROJECT_ID}/gelyu-api/gelyu-api"
-
-# Build and push the container image
-cd backend
-gcloud builds submit --tag "${IMAGE}" --project=${PROJECT_ID}
-
-# Deploy to Cloud Run
-gcloud run deploy gelyu-api \
-    --image="${IMAGE}" \
-    --region=us-west1 \
-    --platform=managed \
-    --allow-unauthenticated \
-    --set-env-vars="GCP_PROJECT_ID=${PROJECT_ID},ALLOWED_ORIGINS=https://www.gelyu.com;https://gelyu.com" \
-    --min-instances=0 \
-    --max-instances=3 \
-    --memory=256Mi \
-    --cpu=1 \
-    --timeout=30 \
-    --project=${PROJECT_ID}
-```
-
-Note: `--allow-unauthenticated` is required because Firebase Hosting proxies requests to Cloud Run. The application-level auth (Firebase ID token verification) provides the actual security.
-
-### Deploy Frontend (Firebase Hosting)
+### Deploy
 
 ```bash
-# From repo root
-firebase deploy --only hosting --project project-c243fac2-f8de-4142-8aa
+make deploy            # Deploy both (backend first, then frontend)
+
+# Or individually:
+make deploy-backend    # Build container + deploy to Cloud Run
+make deploy-frontend   # Deploy to Firebase Hosting
 ```
 
-### Deployment Order
+Note: Backend must be deployed first (Cloud Run service must exist for the Firebase Hosting rewrite to work). `make deploy` handles this order automatically.
 
-1. Deploy **backend** first (Cloud Run service must exist for the hosting rewrite to work)
-2. Deploy **frontend** second (Firebase Hosting)
+The Cloud Run service uses `--allow-unauthenticated` because Firebase Hosting proxies requests to it. The application-level auth (Firebase ID token verification) provides the actual security.
 
 ## Custom Domain Setup (Migration from GitHub Pages)
 
-The site was previously hosted on GitHub Pages with a `CNAME` file. To migrate to Firebase Hosting:
+The site was previously hosted on GitHub Pages with a `CNAME` file. Follow these steps in order to migrate to Firebase Hosting with minimal downtime.
 
-1. **Remove GitHub Pages**: Go to the GitHub repo > Settings > Pages > Set source to "None" (or delete the CNAME record)
-2. **Add custom domain in Firebase**: Firebase Console > Hosting > Add custom domain
-   - Add `www.gelyu.com`
-   - Optionally add `gelyu.com` (apex domain)
-3. **Update DNS records** at your domain registrar:
-   - Firebase will provide the required A and/or AAAA records
-   - Remove any existing CNAME pointing to `<username>.github.io`
-   - Add the records Firebase provides
-4. **Wait for DNS propagation** (can take up to 48 hours, usually much faster)
-5. **SSL certificate**: Firebase automatically provisions an SSL certificate once DNS verification succeeds
+### Step 1: Verify Firebase Hosting works on the default URL
+
+After running `make deploy`, visit the default Firebase URL to confirm the site works:
+- `https://project-c243fac2-f8de-4142-8aa.web.app`
+
+### Step 2: Add custom domain in Firebase Console
+
+1. Go to [Firebase Console](https://console.firebase.google.com/) > Hosting
+2. Click **Add custom domain**
+3. Enter `www.gelyu.com`
+4. Firebase will show a **TXT record** for domain ownership verification — add it at your domain registrar
+5. Wait for Firebase to verify ownership (can be instant or take a few minutes)
+6. Firebase will then show **A records** (typically two IP addresses) — note these for Step 3
+7. Optionally repeat for the apex domain `gelyu.com`
+
+### Step 3: Update DNS records (Namecheap)
+
+1. Log in to [Namecheap](https://www.namecheap.com/) > **Domain List** > click **Manage** next to `gelyu.com`
+2. Go to the **Advanced DNS** tab
+3. Delete the existing **CNAME Record** with host `www` pointing to `<username>.github.io`
+4. Add the CNAME record Firebase provided in Step 2:
+   - Click **Add New Record** > Type: `CNAME Record`, Host: `www`, Value: `<value from Firebase>`, TTL: Automatic
+5. If you added the apex domain (`gelyu.com`), Firebase will provide **A records** for `@` (apex domains cannot use CNAME)
+6. Keep the TXT record from Step 2
+7. Namecheap DNS updates typically propagate within 5–30 minutes
+
+### Step 4: Disable GitHub Pages
+
+1. Go to the GitHub repo > **Settings** > **Pages**
+2. Set source to **"None"** (or simply delete the repo if it's only used for hosting)
+3. This ensures GitHub stops trying to serve the domain
+
+### Step 5: Wait for DNS propagation and SSL
+
+- DNS propagation typically takes minutes to a few hours (up to 48 hours in rare cases)
+- You can check progress: `dig www.gelyu.com` — look for the Firebase A record IPs
+- Firebase **automatically provisions a free SSL certificate** once DNS verification succeeds
+- The Firebase Console Hosting page will show the domain status as **"Connected"** when ready
+
+### Troubleshooting
+
+- **Site shows GitHub 404 after DNS change**: DNS is still propagating. Wait and retry.
+- **SSL certificate pending**: Firebase needs DNS to fully resolve before provisioning SSL. Can take up to 24 hours.
+- **Both GitHub and Firebase serving intermittently**: Normal during DNS propagation. Once propagation completes, all traffic goes to Firebase.
 
 ## Environment Variables
 
