@@ -61,6 +61,9 @@ async function checkVaultAccess() {
     }
 }
 
+// Wire up sign-in button (avoids inline onclick blocked by CSP)
+document.getElementById("vault-sign-in-btn").onclick = signInWithGoogle;
+
 // Listen for auth state changes on the vault page
 auth.onAuthStateChanged(function (user) {
     if (user) {
