@@ -29,7 +29,7 @@ async def get_current_user(request: Request) -> AuthenticatedUser:
     token = auth_header.split("Bearer ")[1]
 
     try:
-        decoded_token = firebase_auth.verify_id_token(token)
+        decoded_token = firebase_auth.verify_id_token(token, check_revoked=True)
     except Exception as e:
         logger.error("Token verification failed: %s", e)
         raise HTTPException(status_code=401, detail="Invalid or expired token")
