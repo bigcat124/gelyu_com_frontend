@@ -40,11 +40,6 @@ function renderSubVaultList(subVaults, container) {
             card.appendChild(desc);
         }
 
-        var badge = document.createElement("span");
-        badge.className = "access-badge access-badge-" + sv.access_level;
-        badge.textContent = sv.access_level;
-        card.appendChild(badge);
-
         list.appendChild(card);
     });
     container.appendChild(list);

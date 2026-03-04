@@ -41,6 +41,19 @@ class SubVaultListResponse(BaseModel):
     sub_vaults: list[SubVaultResponse]
 
 
+class UpdateSubVaultRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+class AccessEntry(BaseModel):
+    email: str
+    level: str
+
+
+class AccessListResponse(BaseModel):
+    users: list[AccessEntry]
+
+
 def name_to_slug(name: str) -> str:
     """Convert a sub-vault name to a URL-safe slug using underscores."""
     slug = name.lower().strip()

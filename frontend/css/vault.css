@@ -21,6 +21,7 @@
     margin-bottom: 20px;
 }
 
+/* Sub-vault card grid */
 .sub-vault-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -54,35 +55,10 @@
     color: #666;
     font-size: 0.95rem;
     text-align: left;
-    margin: 0 0 12px 0;
+    margin: 0;
 }
 
-.access-badge {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    padding: 2px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.5px;
-}
-
-.access-badge-read {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-.access-badge-write {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.access-badge-admin {
-    background: #fff3e0;
-    color: #e65100;
-}
-
-/* Admin sections */
+/* Admin create section */
 .admin-section {
     margin: 20px 0;
     text-align: left;
@@ -113,6 +89,7 @@
     max-width: 500px;
 }
 
+/* Shared form styles */
 .form-group {
     margin-bottom: 16px;
 }
@@ -179,22 +156,6 @@
     background: #495057;
 }
 
-.btn-danger {
-    background: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.btn-danger:hover {
-    background: #c82333;
-}
-
 .form-message {
     margin-top: 12px;
     font-size: 0.9rem;
@@ -209,34 +170,44 @@
     color: #dc3545;
 }
 
-/* Vault detail layout */
+/* Hero title row with settings link */
+.hero-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.hero-settings-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 14px;
+    border-radius: 4px;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.hero-settings-link:hover {
+    color: white;
+    border-color: white;
+}
+
+/* Vault detail page */
 .vault-detail-content {
     text-align: left;
     max-width: 700px;
     margin: 0 auto;
 }
 
-.vault-detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
 .vault-description {
     color: #444;
     font-size: 1.05rem;
     line-height: 1.6;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
-.vault-meta {
-    color: #888;
-    font-size: 0.85rem;
-    margin-bottom: 24px;
-}
-
-/* Placeholder content area */
 .vault-content-area {
     background: white;
     border: 1px solid #dee2e6;
@@ -252,63 +223,8 @@
     text-align: center;
 }
 
-/* Settings toggle */
-.settings-wrapper {
-    position: relative;
-}
-
-.settings-toggle-btn {
-    background: none;
-    border: 1px solid #ced4da;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    color: #555;
-    cursor: pointer;
-    transition: border-color 0.3s ease, color 0.3s ease;
-}
-
-.settings-toggle-btn:hover {
-    border-color: #003d5c;
-    color: #003d5c;
-}
-
-.settings-panel {
-    margin-top: 16px;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-/* Access management section */
-.access-management h4 {
-    color: #003d5c;
-    font-size: 1.1rem;
-    margin-bottom: 16px;
-}
-
-.access-form-row {
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-}
-
-.access-form-row .form-group {
-    margin-bottom: 0;
-    flex: 1;
-    min-width: 150px;
-}
-
-.access-form-row button {
-    flex-shrink: 0;
-}
-
 .back-link {
     display: inline-block;
-    margin-top: 24px;
     color: #003d5c;
     text-decoration: none;
     font-weight: 500;
@@ -317,4 +233,113 @@
 .back-link:hover {
     color: #663399;
     text-decoration: underline;
+}
+
+/* Settings page */
+.vault-settings-content {
+    text-align: left;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-label {
+    display: block;
+    font-weight: 600;
+    color: #003d5c;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.settings-name-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.settings-input {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    flex: 1;
+}
+
+.settings-input:focus {
+    outline: none;
+    border-color: #003d5c;
+    box-shadow: 0 0 0 2px rgba(0, 61, 92, 0.15);
+}
+
+.settings-select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.settings-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.settings-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: #f1f3f5;
+    color: #003d5c;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.settings-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.settings-table tr:last-child td {
+    border-bottom: none;
+}
+
+.access-level-select {
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    background: white;
+}
+
+.btn-remove {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.btn-remove:hover {
+    background: #fee;
+}
+
+.settings-add-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
 }

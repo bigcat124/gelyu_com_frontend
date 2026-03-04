@@ -14,12 +14,15 @@ from app.access import (
 from app.auth import AuthenticatedUser, require_admin, require_allowlist
 from app.dependencies import get_firestore_client, get_settings
 from app.models import (
+    AccessEntry,
+    AccessListResponse,
     CreateSubVaultRequest,
     GrantAccessRequest,
     RevokeAccessRequest,
     SubVaultDetailResponse,
     SubVaultListResponse,
     SubVaultResponse,
+    UpdateSubVaultRequest,
     name_to_slug,
 )
 
@@ -154,6 +157,69 @@ async def get_sub_vault(
         access_level=access_level,
         is_admin=is_user_admin,
     )
+
+
+@router.patch("/{slug}")
+@limiter.limit(settings.rate_limit_auth)
+async def update_sub_vault(
+    request: Request,
+    slug: str,
+    body: UpdateSubVaultRequest,
+    user: AuthenticatedUser = Depends(require_admin),
+):
+    """Update a sub-vault's name. Admin only."""
+    db = get_firestore_client()
+
+    result = get_sub_vault_by_slug(db, slug)
+    if not result:
+        raise HTTPException(status_code=404, detail="Sub-vault not found.")
+
+    doc_id, data = result
+    new_slug = name_to_slug(body.name)
+
+    if not new_slug:
+        raise HTTPException(status_code=400, detail="Name produces an invalid slug.")
+
+    # Check slug uniqueness if it changed
+    if new_slug != slug:
+        existing = get_sub_vault_by_slug(db, new_slug)
+        if existing:
+            raise HTTPException(status_code=409, detail=f"Sub-vault with slug '{new_slug}' already exists.")
+
+    db.collection("sub_vaults").document(doc_id).update({
+        "name": body.name,
+        "slug": new_slug,
+    })
+
+    return {"slug": new_slug, "name": body.name}
+
+
+@router.get("/{slug}/access")
+@limiter.limit(settings.rate_limit_auth)
+async def list_sub_vault_access(
+    request: Request,
+    slug: str,
+    user: AuthenticatedUser = Depends(require_admin),
+):
+    """List all users with access to a sub-vault. Admin only."""
+    db = get_firestore_client()
+
+    result = get_sub_vault_by_slug(db, slug)
+    if not result:
+        raise HTTPException(status_code=404, detail="Sub-vault not found.")
+
+    doc_id, _ = result
+
+    # Query all allowlist docs and filter for those with access to this sub-vault
+    allowlist_docs = db.collection("allowlist").get()
+    users = []
+    for doc in allowlist_docs:
+        data = doc.to_dict()
+        access_group = data.get("access_group", {})
+        if isinstance(access_group, dict) and doc_id in access_group:
+            users.append(AccessEntry(email=doc.id, level=access_group[doc_id]))
+
+    return AccessListResponse(users=users)
 
 
 @router.post("/{slug}/access")

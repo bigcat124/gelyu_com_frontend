@@ -5,6 +5,7 @@ Default port: 5001
 """
 
 import os
+import re
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
@@ -13,8 +14,11 @@ PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 5001
 
 class RewriteHandler(SimpleHTTPRequestHandler):
     def translate_path(self, path):
+        # Rewrite /vault/<slug>/settings to /vault-settings.html
+        if re.match(r"^/vault/[^/]+/settings$", path):
+            path = "/vault-settings.html"
         # Rewrite /vault/<slug> to /vault-detail.html
-        if path.startswith("/vault/"):
+        elif path.startswith("/vault/"):
             path = "/vault-detail.html"
         return super().translate_path(path)
 

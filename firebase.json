@@ -18,6 +18,10 @@
         }
       },
       {
+        "source": "/vault/*/settings",
+        "destination": "/vault-settings.html"
+      },
+      {
         "source": "/vault/**",
         "destination": "/vault-detail.html"
       }
