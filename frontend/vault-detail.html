@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vault - Ge Lyu">
+    <meta name="author" content="Ge Lyu">
+    <title>Vault - Ge Lyu</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/vault.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2 id="vault-title">Vault</h2>
+            </div>
+        </section>
+
+        <section class="vault-content" style="flex: 1;">
+            <div class="container">
+                <div id="vault-status">
+                    <div id="vault-not-signed-in" class="vault-message">
+                        <h3>Sign in required</h3>
+                        <p>Please sign in with your Google account to access this vault.</p>
+                        <button class="cta-button" id="vault-sign-in-btn">Sign in with Google</button>
+                    </div>
+                    <div id="vault-loading" class="vault-message" style="display: none;">
+                        <p>Checking access...</p>
+                    </div>
+                    <div id="vault-granted" class="vault-message" style="display: none;">
+                    </div>
+                    <div id="vault-denied" class="vault-message" style="display: none;">
+                        <h3>Access Denied</h3>
+                        <p>You do not have access to this vault.</p>
+                    </div>
+                    <div id="vault-not-found" class="vault-message" style="display: none;">
+                        <h3>Not Found</h3>
+                        <p>This vault does not exist.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="/js/firebase-init.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/shared-loader.js"></script>
+    <script src="/js/vault-detail.js"></script>
+</body>
+</html>

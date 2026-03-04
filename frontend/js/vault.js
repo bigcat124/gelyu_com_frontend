@@ -45,14 +45,52 @@ async function checkVaultAccess() {
         }
 
         var data = await response.json();
+
+        // Fetch accessible sub-vaults
+        var subVaultsResponse = await fetch(API_BASE + "/api/vault/sub-vaults", {
+            headers: { "Authorization": "Bearer " + token },
+        });
+        var subVaultsData = subVaultsResponse.ok ? await subVaultsResponse.json() : { sub_vaults: [] };
+
         var grantedEl = document.getElementById("vault-granted");
         grantedEl.textContent = "";
+
         var h3 = document.createElement("h3");
         h3.textContent = "Welcome, " + data.email;
-        var p = document.createElement("p");
-        p.textContent = data.content;
         grantedEl.appendChild(h3);
-        grantedEl.appendChild(p);
+
+        if (subVaultsData.sub_vaults.length === 0) {
+            var p = document.createElement("p");
+            p.textContent = "No sub-vaults available.";
+            grantedEl.appendChild(p);
+        } else {
+            var list = document.createElement("div");
+            list.className = "sub-vault-list";
+            subVaultsData.sub_vaults.forEach(function (sv) {
+                var card = document.createElement("a");
+                card.href = "/vault/" + sv.slug;
+                card.className = "sub-vault-card";
+
+                var name = document.createElement("h4");
+                name.textContent = sv.name;
+                card.appendChild(name);
+
+                if (sv.description) {
+                    var desc = document.createElement("p");
+                    desc.textContent = sv.description;
+                    card.appendChild(desc);
+                }
+
+                var badge = document.createElement("span");
+                badge.className = "access-badge access-badge-" + sv.access_level;
+                badge.textContent = sv.access_level;
+                card.appendChild(badge);
+
+                list.appendChild(card);
+            });
+            grantedEl.appendChild(list);
+        }
+
         showVaultState("vault-granted");
 
     } catch (error) {

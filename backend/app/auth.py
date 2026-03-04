@@ -16,6 +16,7 @@ class AuthenticatedUser:
         self.email = email
         self.name = name
         self.token_claims = token_claims
+        self.allowlist_data: dict = {}
 
 
 async def get_current_user(request: Request) -> AuthenticatedUser:
@@ -49,8 +50,12 @@ async def require_allowlist(user: AuthenticatedUser = Depends(get_current_user))
     allowlist_ref = db.collection("allowlist").document(user.email)
     allowlist_doc = allowlist_ref.get()
 
-    if not allowlist_doc.exists or allowlist_doc.to_dict().get("status") != "active":
+    allowlist_data = allowlist_doc.to_dict() if allowlist_doc.exists else {}
+
+    if not allowlist_doc.exists or allowlist_data.get("status") != "active":
         raise HTTPException(status_code=403, detail="Access denied. You are not on the allowlist.")
+
+    user.allowlist_data = allowlist_data
 
     # Upsert user profile
     user_ref = db.collection("users").document(user.uid)
@@ -63,4 +68,11 @@ async def require_allowlist(user: AuthenticatedUser = Depends(get_current_user))
         merge=True,
     )
 
+    return user
+
+
+async def require_admin(user: AuthenticatedUser = Depends(require_allowlist)) -> AuthenticatedUser:
+    """Require admin role. Returns 403 if user is not an admin."""
+    if user.allowlist_data.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required.")
     return user
