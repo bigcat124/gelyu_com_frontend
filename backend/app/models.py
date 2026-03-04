@@ -34,6 +34,7 @@ class SubVaultResponse(BaseModel):
 class SubVaultDetailResponse(SubVaultResponse):
     created_at: str | None = None
     created_by: str
+    is_admin: bool = False
 
 
 class SubVaultListResponse(BaseModel):

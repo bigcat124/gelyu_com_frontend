@@ -152,6 +152,7 @@ async def get_sub_vault(
         created_at=created_at_str,
         created_by=data.get("created_by", ""),
         access_level=access_level,
+        is_admin=is_user_admin,
     )
 
 
