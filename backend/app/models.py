@@ -9,9 +9,13 @@ class AccessLevel(str, Enum):
     write = "write"
 
 
-class CreateSubVaultRequest(BaseModel):
+class CreateVaultRequest(BaseModel):
     name: str = Field(min_length=1, max_length=100)
     description: str = Field(default="", max_length=1000)
+
+
+class UpdateVaultRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
 
 
 class GrantAccessRequest(BaseModel):
@@ -23,7 +27,7 @@ class RevokeAccessRequest(BaseModel):
     email: str = Field(min_length=1)
 
 
-class SubVaultResponse(BaseModel):
+class VaultResponse(BaseModel):
     id: str
     slug: str
     name: str
@@ -31,18 +35,14 @@ class SubVaultResponse(BaseModel):
     access_level: str | None = None
 
 
-class SubVaultDetailResponse(SubVaultResponse):
+class VaultDetailResponse(VaultResponse):
     created_at: str | None = None
     created_by: str
     is_admin: bool = False
 
 
-class SubVaultListResponse(BaseModel):
-    sub_vaults: list[SubVaultResponse]
-
-
-class UpdateSubVaultRequest(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
+class VaultListResponse(BaseModel):
+    vaults: list[VaultResponse]
 
 
 class AccessEntry(BaseModel):
@@ -55,7 +55,7 @@ class AccessListResponse(BaseModel):
 
 
 def name_to_slug(name: str) -> str:
-    """Convert a sub-vault name to a URL-safe slug using underscores."""
+    """Convert a vault name to a URL-safe slug using underscores."""
     slug = name.lower().strip()
     slug = re.sub(r"[^a-z0-9\s]", "", slug)
     slug = re.sub(r"\s+", "_", slug)

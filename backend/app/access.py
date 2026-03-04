@@ -35,10 +35,10 @@ def revoke_access(db, email: str, resource_id: str) -> None:
     )
 
 
-def get_sub_vault_by_slug(db, slug: str):
-    """Look up a sub-vault by its slug. Returns (doc_id, data) or None."""
+def get_vault_by_slug(db, slug: str):
+    """Look up a vault by its slug. Returns (doc_id, data) or None."""
     docs = (
-        db.collection("sub_vaults")
+        db.collection("vaults")
         .where(filter=FieldFilter("slug", "==", slug))
         .limit(1)
         .get()

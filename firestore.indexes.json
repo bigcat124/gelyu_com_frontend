@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "collectionGroup": "sub_vaults",
+      "collectionGroup": "vaults",
       "queryScope": "COLLECTION",
       "fields": [
         {

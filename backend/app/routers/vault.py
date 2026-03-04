@@ -7,7 +7,7 @@ from app.dependencies import get_settings
 
 settings = get_settings()
 limiter = Limiter(key_func=get_remote_address)
-router = APIRouter(prefix="/api/vault", tags=["vault"])
+router = APIRouter(prefix="/api/vaults", tags=["vaults"])
 
 
 @router.get("/access")

@@ -21,8 +21,8 @@
     margin-bottom: 20px;
 }
 
-/* Sub-vault card grid */
-.sub-vault-list {
+/* Vault card grid */
+.vault-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
@@ -30,7 +30,7 @@
     text-align: left;
 }
 
-.sub-vault-card {
+.vault-card {
     display: block;
     background: white;
     border: 1px solid #dee2e6;
@@ -40,18 +40,18 @@
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.sub-vault-card:hover {
+.vault-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-color: #003d5c;
 }
 
-.sub-vault-card h4 {
+.vault-card h4 {
     color: #003d5c;
     font-size: 1.2rem;
     margin-bottom: 8px;
 }
 
-.sub-vault-card p {
+.vault-card p {
     color: #666;
     font-size: 0.95rem;
     text-align: left;
@@ -178,7 +178,27 @@
     gap: 16px;
 }
 
+.hero-action-btn {
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    font-family: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 4px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.hero-action-btn:hover {
+    color: white;
+    border-color: white;
+}
+
 .hero-settings-link {
+    margin-top: 10px;
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     font-size: 0.9rem;

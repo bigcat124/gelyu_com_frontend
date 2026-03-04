@@ -1,5 +1,5 @@
 /**
- * Sub-vault detail page: extract slug from URL, check auth, fetch sub-vault detail.
+ * Vault detail page: extract slug from URL, check auth, fetch vault detail.
  * Depends on auth.js and firebase-init.js being loaded first.
  */
 
@@ -22,7 +22,7 @@ function showVaultState(stateId) {
     document.getElementById(stateId).style.display = "block";
 }
 
-async function loadSubVault() {
+async function loadVault() {
     var slug = getSlugFromPath();
     if (!slug) {
         showVaultState("vault-not-found");
@@ -38,7 +38,7 @@ async function loadSubVault() {
     }
 
     try {
-        var response = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug), {
+        var response = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug), {
             headers: { "Authorization": "Bearer " + token },
         });
 
@@ -106,7 +106,7 @@ async function loadSubVault() {
         showVaultState("vault-granted");
 
     } catch (error) {
-        console.error("Sub-vault load failed");
+        console.error("Vault load failed");
         showVaultState("vault-denied");
     }
 }
@@ -117,7 +117,7 @@ document.getElementById("vault-sign-in-btn").onclick = signInWithGoogle;
 // Listen for auth state changes
 auth.onAuthStateChanged(function (user) {
     if (user) {
-        loadSubVault();
+        loadVault();
     } else {
         showVaultState("vault-not-signed-in");
     }

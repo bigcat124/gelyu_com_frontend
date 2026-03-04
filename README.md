@@ -1,6 +1,6 @@
 # gelyu.com
 
-Personal website with public pages and a protected vault, powered by Firebase Hosting + FastAPI on Google Cloud Run.
+Personal website with public pages and a protected vaults section, powered by Firebase Hosting + FastAPI on Google Cloud Run.
 
 ## Architecture
 
@@ -8,17 +8,17 @@ Personal website with public pages and a protected vault, powered by Firebase Ho
 Browser → Firebase Hosting (static HTML from frontend/)
               ├── /about.html, /contact.html       (public, no auth)
               ├── /vault.html                       (requires Google sign-in + allowlist)
-              ├── /vault/{slug}                     (sub-vault detail, rewritten to vault-detail.html)
+              ├── /vault/{slug}                     (vault detail, rewritten to vault-detail.html)
               └── /api/**  →  Cloud Run (FastAPI, us-west1)
                                    ├── Firebase Admin SDK (verify ID tokens)
-                                   └── Firestore (allowlist/{email}, users/{uid}, sub_vaults/{id})
+                                   └── Firestore (allowlist/{email}, users/{uid}, vaults/{id})
 ```
 
 - **Frontend**: Plain HTML + JS, Firebase Auth (Google sign-in), served by Firebase Hosting
 - **Backend**: FastAPI (Python), containerized, deployed to Cloud Run
 - **Auth**: Firebase Auth JS SDK on client → Firebase ID token → Backend verifies token + checks Firestore allowlist
-- **Access control**: Admin users can create sub-vaults and grant/revoke per-user access (read/write) via access groups stored in the allowlist
-- **Hosting rewrite**: `/api/**` requests are proxied by Firebase Hosting to Cloud Run (same-origin, no CORS issues); `/vault/**` is rewritten to `vault-detail.html`
+- **Access control**: Admin users can create vaults and grant/revoke per-user access (read/write) via access groups stored in the allowlist
+- **Hosting rewrite**: `/api/**` requests are proxied by Firebase Hosting to Cloud Run (same-origin, no CORS issues); `/vault/{slug}` is rewritten to `vault-detail.html`
 
 ## Project Structure
 
@@ -33,19 +33,19 @@ Browser → Firebase Hosting (static HTML from frontend/)
 │   ├── index.html           # Redirects to about.html
 │   ├── about.html           # Public - About Me page
 │   ├── contact.html         # Public - Contact page
-│   ├── vault.html           # Protected - sub-vault listing (sign-in + allowlist)
-│   ├── vault-detail.html    # Protected - sub-vault detail page
+│   ├── vault.html           # Protected - Vaults listing (sign-in + allowlist)
+│   ├── vault-detail.html    # Protected - Vault detail page
 │   ├── 404.html             # Custom 404 page
 │   ├── dev_server.py        # Local dev server with Firebase-style rewrites
 │   ├── css/
 │   │   ├── styles.css       # Global styles
-│   │   └── vault.css        # Vault + sub-vault page styles
+│   │   └── vault.css        # Vaults page + vault detail styles
 │   ├── js/
 │   │   ├── firebase-init.js # Firebase config + initialization
 │   │   ├── auth.js          # Google sign-in/out, token management
 │   │   ├── shared-loader.js # Loads shared header/footer into pages
-│   │   ├── vault.js         # Vault listing page (sub-vault cards, admin create form)
-│   │   └── vault-detail.js  # Sub-vault detail page (content, admin settings)
+│   │   ├── vault.js         # Vaults listing page (vault cards, admin create form)
+│   │   └── vault-detail.js  # Vault detail page (content, admin settings)
 │   ├── shared/
 │   │   ├── header.html      # Shared nav bar (includes auth button)
 │   │   └── footer.html      # Shared footer
@@ -65,8 +65,8 @@ Browser → Firebase Hosting (static HTML from frontend/)
 │       ├── models.py        # Pydantic request/response models
 │       └── routers/
 │           ├── health.py    # GET /api/health
-│           ├── vault.py     # GET /api/vault/access (protected)
-│           └── sub_vault.py # Sub-vault CRUD + access management (admin)
+│           ├── vault.py     # GET /api/vaults/access (protected)
+│           └── vault_crud.py # Vault CRUD + access management (admin)
 ```
 
 ## Prerequisites
@@ -124,7 +124,7 @@ python frontend/dev_server.py
 
 This starts a local server on `http://localhost:5001` with the same rewrite rules as Firebase Hosting. The frontend JS automatically detects `localhost` and sends API requests to `http://localhost:8080` (the backend started in step 3).
 
-> **Note:** Do not use `python -m http.server` — it cannot handle the `/vault/{slug}` rewrites and will return 404 for sub-vault detail pages.
+> **Note:** Do not use `python -m http.server` — it cannot handle the `/vault/{slug}` rewrites and will return 404 for vault detail pages.
 
 ### Cleanup
 
@@ -291,13 +291,13 @@ No service account key files are needed in production — Cloud Run uses Applica
 
 ### `allowlist/{email}`
 
-Controls who can access protected pages and which sub-vaults they can see.
+Controls who can access protected pages and which vaults they can see.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `status` | string | `"active"` or `"revoked"` |
 | `role` | string | `"admin"` for admin users (optional) |
-| `access_group` | map | `{ sub_vault_doc_id: "read" \| "write", ... }` |
+| `access_group` | map | `{ vault_doc_id: "read" \| "write", ... }` |
 | `added_at` | timestamp | When the entry was created |
 | `note` | string | Optional description |
 
@@ -311,9 +311,9 @@ Auto-created when an allowlisted user accesses the vault.
 | `name` | string | User's display name |
 | `last_login` | timestamp | Last vault access time |
 
-### `sub_vaults/{id}`
+### `vaults/{id}`
 
-Sub-vault containers created by admins.
+Vault containers created by admins.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -340,20 +340,20 @@ Then open `http://localhost:5001/vault.html` in a browser.
 ### After deployment, verify:
 
 - [ ] `curl https://www.gelyu.com/api/health` returns `{"status":"ok"}`
-- [ ] `curl https://www.gelyu.com/api/vault/access` returns 401 (no token)
+- [ ] `curl https://www.gelyu.com/api/vaults/access` returns 401 (no token)
 - [ ] Public pages load without sign-in: `/about.html`, `/contact.html`
 - [ ] "Sign In" button appears in the header
 - [ ] Google sign-in popup works
 - [ ] After sign-in, header shows email + "Sign Out" button
-- [ ] Vault page with allowlisted account: shows sub-vault cards
-- [ ] Vault page with non-allowlisted account: shows "Access Denied" (403)
-- [ ] Sign out: vault page shows "Sign in required"
-- [ ] **Admin**: "+ Create Sub-Vault" button visible on vault page
-- [ ] **Admin**: Can create a sub-vault (card appears in list)
-- [ ] **Admin**: Sub-vault detail page shows "Settings" button
+- [ ] Vaults page with allowlisted account: shows vault cards
+- [ ] Vaults page with non-allowlisted account: shows "Access Denied" (403)
+- [ ] Sign out: Vaults page shows "Sign in required"
+- [ ] **Admin**: "+ Create Vault" button visible on Vaults page
+- [ ] **Admin**: Can create a vault (card appears in list)
+- [ ] **Admin**: Vault detail page shows "Settings" button
 - [ ] **Admin**: Can grant/revoke access to other users via Settings
-- [ ] **Non-admin**: No create button on vault page, no settings on detail page
-- [ ] **Non-admin**: Can only see sub-vaults they have access to
-- [ ] Sub-vault detail page accessible via `/vault/{slug}` URL
+- [ ] **Non-admin**: No create button on Vaults page, no settings on detail page
+- [ ] **Non-admin**: Can only see vaults they have access to
+- [ ] Vault detail page accessible via `/vault/{slug}` URL
 - [ ] Firestore `users/{uid}` document created after vault access
 - [ ] `https://www.gelyu.com` resolves to Firebase Hosting (not GitHub Pages)

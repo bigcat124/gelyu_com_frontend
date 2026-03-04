@@ -1,5 +1,5 @@
 /**
- * Vault page logic: check auth state, call backend, show appropriate UI.
+ * Vaults page logic: check auth state, call backend, show appropriate UI.
  * Depends on auth.js being loaded first.
  */
 
@@ -15,28 +15,28 @@ function showVaultState(stateId) {
     document.getElementById(stateId).style.display = "block";
 }
 
-function renderSubVaultList(subVaults, container) {
-    if (subVaults.length === 0) {
+function renderVaultList(vaults, container) {
+    if (vaults.length === 0) {
         var p = document.createElement("p");
-        p.textContent = "No sub-vaults available.";
+        p.textContent = "No vaults available.";
         container.appendChild(p);
         return;
     }
 
     var list = document.createElement("div");
-    list.className = "sub-vault-list";
-    subVaults.forEach(function (sv) {
+    list.className = "vault-list";
+    vaults.forEach(function (v) {
         var card = document.createElement("a");
-        card.href = "/vault/" + sv.slug;
-        card.className = "sub-vault-card";
+        card.href = "/vault/" + v.slug;
+        card.className = "vault-card";
 
         var name = document.createElement("h4");
-        name.textContent = sv.name;
+        name.textContent = v.name;
         card.appendChild(name);
 
-        if (sv.description) {
+        if (v.description) {
             var desc = document.createElement("p");
-            desc.textContent = sv.description;
+            desc.textContent = v.description;
             card.appendChild(desc);
         }
 
@@ -45,22 +45,14 @@ function renderSubVaultList(subVaults, container) {
     container.appendChild(list);
 }
 
-function renderCreateForm(token) {
-    var section = document.createElement("div");
-    section.className = "admin-section";
-
-    var toggle = document.createElement("button");
-    toggle.className = "admin-toggle-btn";
-    toggle.textContent = "+ Create Sub-Vault";
-    section.appendChild(toggle);
-
+function renderCreateForm(token, grantedEl) {
     var form = document.createElement("div");
     form.className = "admin-form";
     form.style.display = "none";
     form.innerHTML =
         '<div class="form-group">' +
             '<label for="create-name">Name</label>' +
-            '<input type="text" id="create-name" maxlength="100" placeholder="Sub-vault name">' +
+            '<input type="text" id="create-name" maxlength="100" placeholder="Vault name">' +
         '</div>' +
         '<div class="form-group">' +
             '<label for="create-desc">Description</label>' +
@@ -71,16 +63,16 @@ function renderCreateForm(token) {
             '<button id="create-cancel" class="btn-secondary">Cancel</button>' +
         '</div>' +
         '<div id="create-message" class="form-message"></div>';
-    section.appendChild(form);
 
-    toggle.onclick = function () {
-        form.style.display = "block";
-        toggle.style.display = "none";
+    var heroBtn = document.getElementById("hero-create-btn");
+    heroBtn.style.display = "";
+
+    heroBtn.onclick = function () {
+        form.style.display = form.style.display === "none" ? "block" : "none";
     };
 
     form.querySelector("#create-cancel").onclick = function () {
         form.style.display = "none";
-        toggle.style.display = "";
         form.querySelector("#create-name").value = "";
         form.querySelector("#create-desc").value = "";
         form.querySelector("#create-message").textContent = "";
@@ -100,7 +92,7 @@ function renderCreateForm(token) {
         }
 
         try {
-            var res = await fetch(API_BASE + "/api/vault/sub-vaults", {
+            var res = await fetch(API_BASE + "/api/vaults", {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + token,
@@ -110,19 +102,19 @@ function renderCreateForm(token) {
             });
 
             if (res.status === 409) {
-                msgEl.textContent = "A sub-vault with that name already exists.";
+                msgEl.textContent = "A vault with that name already exists.";
                 msgEl.className = "form-message form-message-error";
                 return;
             }
 
             if (!res.ok) {
                 var err = await res.json().catch(function () { return {}; });
-                msgEl.textContent = err.detail || "Failed to create sub-vault.";
+                msgEl.textContent = err.detail || "Failed to create vault.";
                 msgEl.className = "form-message form-message-error";
                 return;
             }
 
-            msgEl.textContent = "Sub-vault created.";
+            msgEl.textContent = "Vault created.";
             msgEl.className = "form-message form-message-success";
             form.querySelector("#create-name").value = "";
             form.querySelector("#create-desc").value = "";
@@ -135,7 +127,7 @@ function renderCreateForm(token) {
         }
     };
 
-    return section;
+    return form;
 }
 
 async function checkVaultAccess() {
@@ -148,7 +140,7 @@ async function checkVaultAccess() {
     }
 
     try {
-        var response = await fetch(API_BASE + "/api/vault/access", {
+        var response = await fetch(API_BASE + "/api/vaults/access", {
             headers: { "Authorization": "Bearer " + token },
         });
 
@@ -169,25 +161,24 @@ async function checkVaultAccess() {
 
         var data = await response.json();
 
-        // Fetch accessible sub-vaults
-        var subVaultsResponse = await fetch(API_BASE + "/api/vault/sub-vaults", {
+        // Fetch accessible vaults
+        var vaultsResponse = await fetch(API_BASE + "/api/vaults", {
             headers: { "Authorization": "Bearer " + token },
         });
-        var subVaultsData = subVaultsResponse.ok ? await subVaultsResponse.json() : { sub_vaults: [] };
+        var vaultsData = vaultsResponse.ok ? await vaultsResponse.json() : { vaults: [] };
 
         var grantedEl = document.getElementById("vault-granted");
         grantedEl.textContent = "";
 
-        var h3 = document.createElement("h3");
-        h3.textContent = "Welcome, " + data.email;
-        grantedEl.appendChild(h3);
-
-        // Admin: show create sub-vault form
+        // Admin: show create button in hero + form in body
+        var heroBtn = document.getElementById("hero-create-btn");
         if (data.is_admin) {
-            grantedEl.appendChild(renderCreateForm(token));
+            grantedEl.appendChild(renderCreateForm(token, grantedEl));
+        } else {
+            heroBtn.style.display = "none";
         }
 
-        renderSubVaultList(subVaultsData.sub_vaults, grantedEl);
+        renderVaultList(vaultsData.vaults, grantedEl);
 
         showVaultState("vault-granted");
 
@@ -200,7 +191,7 @@ async function checkVaultAccess() {
 // Wire up sign-in button (avoids inline onclick blocked by CSP)
 document.getElementById("vault-sign-in-btn").onclick = signInWithGoogle;
 
-// Listen for auth state changes on the vault page
+// Listen for auth state changes on the vaults page
 auth.onAuthStateChanged(function (user) {
     if (user) {
         checkVaultAccess();

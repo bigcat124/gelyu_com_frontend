@@ -1,5 +1,5 @@
 /**
- * Sub-vault settings page: edit name, manage user access.
+ * Vault settings page: edit name, manage user access.
  * Admin only. Depends on auth.js and firebase-init.js being loaded first.
  */
 
@@ -66,7 +66,7 @@ function renderNameSection(slug, name, token) {
         }
 
         try {
-            var res = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug) + "", {
+            var res = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "", {
                 method: "PATCH",
                 headers: {
                     "Authorization": "Bearer " + token,
@@ -158,7 +158,7 @@ function renderAccessTable(slug, users, token) {
         }
 
         try {
-            var res = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug) + "/access", {
+            var res = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/access", {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + token,
@@ -221,7 +221,7 @@ function createUserRow(slug, email, level, token, tbody) {
     // Change level on dropdown change
     select.onchange = async function () {
         try {
-            var res = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug) + "/access", {
+            var res = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/access", {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + token,
@@ -242,7 +242,7 @@ function createUserRow(slug, email, level, token, tbody) {
     // Remove user
     removeBtn.onclick = async function () {
         try {
-            var res = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug) + "/access/revoke", {
+            var res = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/access/revoke", {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + token,
@@ -275,8 +275,8 @@ async function loadSettings() {
     }
 
     try {
-        // Fetch sub-vault detail (also checks access + admin)
-        var detailRes = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug), {
+        // Fetch vault detail (also checks access + admin)
+        var detailRes = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug), {
             headers: { "Authorization": "Bearer " + token },
         });
 
@@ -312,7 +312,7 @@ async function loadSettings() {
         document.title = data.name + " \u2014 Settings - Vault - Ge Lyu";
 
         // Fetch access list
-        var accessRes = await fetch(API_BASE + "/api/vault/sub-vaults/" + encodeURIComponent(slug) + "/access", {
+        var accessRes = await fetch(API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/access", {
             headers: { "Authorization": "Bearer " + token },
         });
         var accessData = accessRes.ok ? await accessRes.json() : { users: [] };
