@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.dependencies import init_firebase, get_settings
-from app.routers import health, vault
+from app.routers import health, vault, vault_crud
 
 
 @asynccontextmanager
@@ -28,12 +28,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PATCH"],
     allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(health.router)
 app.include_router(vault.router)
+app.include_router(vault_crud.router)
 
 if __name__ == "__main__":
     import uvicorn

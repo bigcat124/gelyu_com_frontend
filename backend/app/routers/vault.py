@@ -7,7 +7,7 @@ from app.dependencies import get_settings
 
 settings = get_settings()
 limiter = Limiter(key_func=get_remote_address)
-router = APIRouter(prefix="/api/vault", tags=["vault"])
+router = APIRouter(prefix="/api/vaults", tags=["vaults"])
 
 
 @router.get("/access")
@@ -17,5 +17,5 @@ async def vault_access(request: Request, user: AuthenticatedUser = Depends(requi
     return {
         "message": f"Welcome to the vault, {user.name or user.email}.",
         "email": user.email,
-        "content": "This is placeholder vault content. Replace with real data later.",
+        "is_admin": user.allowlist_data.get("role") == "admin",
     }

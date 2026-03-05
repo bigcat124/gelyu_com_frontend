@@ -6,8 +6,8 @@
     <meta name="description" content="Vault - Ge Lyu">
     <meta name="author" content="Ge Lyu">
     <title>Vault - Ge Lyu</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/vault.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/vault.css">
 </head>
 <body>
     <div id="header-placeholder"></div>
@@ -15,8 +15,8 @@
     <main>
         <section class="hero">
             <div class="hero-content">
-                <h2>Vaults</h2>
-                <button id="hero-create-btn" class="hero-action-btn" style="display:none">+ Create</button>
+                <h2 id="vault-title">Vault</h2>
+                <a id="hero-settings-link" href="#" class="hero-settings-link" style="display:none">Settings</a>
             </div>
         </section>
 
@@ -25,7 +25,7 @@
                 <div id="vault-status">
                     <div id="vault-not-signed-in" class="vault-message">
                         <h3>Sign in required</h3>
-                        <p>Please sign in with your Google account to access the vault.</p>
+                        <p>Please sign in with your Google account to access this vault.</p>
                         <button class="cta-button" id="vault-sign-in-btn">Sign in with Google</button>
                     </div>
                     <div id="vault-loading" class="vault-message" style="display: none;">
@@ -35,7 +35,11 @@
                     </div>
                     <div id="vault-denied" class="vault-message" style="display: none;">
                         <h3>Access Denied</h3>
-                        <p>Your account is not on the access list. Contact the site owner if you believe this is an error.</p>
+                        <p>You do not have access to this vault.</p>
+                    </div>
+                    <div id="vault-not-found" class="vault-message" style="display: none;">
+                        <h3>Not Found</h3>
+                        <p>This vault does not exist.</p>
                     </div>
                 </div>
             </div>
@@ -46,9 +50,9 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="js/firebase-init.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/shared-loader.js"></script>
-    <script src="js/vault.js"></script>
+    <script src="/js/firebase-init.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/shared-loader.js"></script>
+    <script src="/js/vault-detail.js"></script>
 </body>
 </html>

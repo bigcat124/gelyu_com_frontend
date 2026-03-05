@@ -1,0 +1,15 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "vaults",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "slug",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
