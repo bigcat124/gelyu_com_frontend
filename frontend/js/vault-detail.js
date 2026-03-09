@@ -1,6 +1,6 @@
 /**
  * Vault detail page: show albums, admin create album.
- * URL: /vault/{slug}
+ * URL: /vaults/{slug}
  * Depends on auth.js and firebase-init.js being loaded first.
  */
 
@@ -36,7 +36,7 @@ function renderAlbumList(albums, slug, container) {
 
     albums.forEach(function (album) {
         var card = document.createElement("a");
-        card.href = "/vault/" + slug + "/" + album.slug;
+        card.href = "/vaults/" + slug + "/" + album.slug;
         card.className = "album-card";
 
         var imgContainer = document.createElement("div");
@@ -224,7 +224,7 @@ async function loadVault() {
         var heroBtn = document.getElementById("hero-create-btn");
         if (data.is_admin) {
             var heroLink = document.getElementById("hero-settings-link");
-            heroLink.href = "/vault/" + slug + "/settings";
+            heroLink.href = "/vaults/" + slug + "/settings";
             heroLink.style.display = "";
 
             content.appendChild(renderCreateAlbumForm(slug, token));
@@ -237,7 +237,7 @@ async function loadVault() {
 
         // Back link
         var backLink = document.createElement("a");
-        backLink.href = "/vault.html";
+        backLink.href = "/vaults.html";
         backLink.textContent = "\u2190 Back to Vaults";
         backLink.className = "back-link";
         content.appendChild(backLink);

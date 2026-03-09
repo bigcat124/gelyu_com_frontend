@@ -18,15 +18,15 @@
         }
       },
       {
-        "source": "/vault/*/settings",
+        "source": "/vaults/*/settings",
         "destination": "/vault-settings.html"
       },
       {
-        "source": "/vault/*/*",
+        "source": "/vaults/*/*",
         "destination": "/vault-album.html"
       },
       {
-        "source": "/vault/**",
+        "source": "/vaults/**",
         "destination": "/vault-detail.html"
       }
     ],

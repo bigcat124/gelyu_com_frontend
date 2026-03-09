@@ -1,6 +1,6 @@
 /**
  * Album page: photo grid, upload, lightbox.
- * URL: /vault/{slug}/{albumSlug}
+ * URL: /vaults/{slug}/{albumSlug}
  * Depends on auth.js and firebase-init.js being loaded first.
  */
 
@@ -145,7 +145,7 @@ async function loadAlbum() {
 
         // Back link
         var backLink = document.createElement("a");
-        backLink.href = "/vault/" + _slug;
+        backLink.href = "/vaults/" + _slug;
         backLink.textContent = "\u2190 Back to " + _vaultName;
         backLink.className = "back-link";
         content.appendChild(backLink);
