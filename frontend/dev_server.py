@@ -17,6 +17,9 @@ class RewriteHandler(SimpleHTTPRequestHandler):
         # Rewrite /vault/<slug>/settings to /vault-settings.html
         if re.match(r"^/vault/[^/]+/settings$", path):
             path = "/vault-settings.html"
+        # Rewrite /vault/<slug>/<albumSlug> to /vault-album.html
+        elif re.match(r"^/vault/[^/]+/[^/]+$", path):
+            path = "/vault-album.html"
         # Rewrite /vault/<slug> to /vault-detail.html
         elif path.startswith("/vault/"):
             path = "/vault-detail.html"

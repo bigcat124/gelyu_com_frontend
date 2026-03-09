@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Vault - Ge Lyu">
+    <meta name="description" content="Album - Vault - Ge Lyu">
     <meta name="author" content="Ge Lyu">
-    <title>Vault - Ge Lyu</title>
+    <title>Album - Vault - Ge Lyu</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/vault.css">
 </head>
@@ -15,9 +15,8 @@
     <main>
         <section class="hero">
             <div class="hero-content">
-                <h2 id="vault-title">Vault</h2>
-                <button id="hero-create-btn" class="hero-action-btn" style="display:none">+ Album</button>
-                <a id="hero-settings-link" href="#" class="hero-settings-link" style="display:none">Settings</a>
+                <h2 id="album-title">Album</h2>
+                <button id="hero-upload-btn" class="hero-action-btn" style="display:none">+ Upload</button>
             </div>
         </section>
 
@@ -26,26 +25,41 @@
                 <div id="vault-status">
                     <div id="vault-not-signed-in" class="vault-message">
                         <h3>Sign in required</h3>
-                        <p>Please sign in with your Google account to access this vault.</p>
+                        <p>Please sign in with your Google account to access this album.</p>
                         <button class="cta-button" id="vault-sign-in-btn">Sign in with Google</button>
                     </div>
                     <div id="vault-loading" class="vault-message" style="display: none;">
-                        <p>Checking access...</p>
+                        <p>Loading...</p>
                     </div>
                     <div id="vault-granted" class="vault-message" style="display: none;">
                     </div>
                     <div id="vault-denied" class="vault-message" style="display: none;">
                         <h3>Access Denied</h3>
-                        <p>You do not have access to this vault.</p>
+                        <p>You do not have access to this album.</p>
                     </div>
                     <div id="vault-not-found" class="vault-message" style="display: none;">
                         <h3>Not Found</h3>
-                        <p>This vault does not exist.</p>
+                        <p>This album does not exist.</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
+
+    <!-- Lightbox overlay -->
+    <div id="lightbox" class="lightbox" style="display:none">
+        <button class="lightbox-close">&times;</button>
+        <button class="lightbox-prev">&lsaquo;</button>
+        <button class="lightbox-next">&rsaquo;</button>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+            <video id="lightbox-video" controls style="display:none"></video>
+        </div>
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+        <div id="lightbox-admin" class="lightbox-admin" style="display:none">
+            <button id="lightbox-delete" class="lightbox-delete-btn">Delete</button>
+        </div>
+    </div>
 
     <div id="footer-placeholder"></div>
 
@@ -54,6 +68,6 @@
     <script src="/js/firebase-init.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/shared-loader.js"></script>
-    <script src="/js/vault-detail.js"></script>
+    <script src="/js/vault-album.js"></script>
 </body>
 </html>

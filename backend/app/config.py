@@ -7,5 +7,7 @@ class Settings(BaseSettings):
     port: int = 8080
     rate_limit_default: str = "60/minute"
     rate_limit_auth: str = "20/minute"
+    gcs_bucket: str = "project-c243fac2-f8de-4142-8aa.firebasestorage.app"
+    gcs_service_account_email: str = ""
 
     model_config = {"env_file": ".env"}

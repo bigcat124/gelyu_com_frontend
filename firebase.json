@@ -22,6 +22,10 @@
         "destination": "/vault-settings.html"
       },
       {
+        "source": "/vault/*/*",
+        "destination": "/vault-album.html"
+      },
+      {
         "source": "/vault/**",
         "destination": "/vault-detail.html"
       }
@@ -44,7 +48,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com; frame-src https://accounts.google.com https://*.firebaseapp.com; img-src 'self' data:"
+            "value": "default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://storage.googleapis.com; frame-src https://accounts.google.com https://*.firebaseapp.com; img-src 'self' data: https://storage.googleapis.com; media-src https://storage.googleapis.com"
           },
           {
             "key": "Strict-Transport-Security",

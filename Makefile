@@ -22,7 +22,7 @@ clean:
 
 ## Run the backend locally
 run:
-	cd backend && conda run -n $(ENV_NAME) uvicorn app.main:app --reload --port 8080
+	cd backend && conda run --no-capture-output -n $(ENV_NAME) uvicorn app.main:app --reload --port 8080 --log-level info
 
 ## Build and deploy backend to Cloud Run
 deploy-backend:
