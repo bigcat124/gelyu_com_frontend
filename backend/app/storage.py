@@ -25,20 +25,27 @@ def _get_bucket():
 
 
 def _signing_kwargs():
-    """Return extra kwargs for signed URL generation.
+    """Return extra kwargs for signed URL generation via IAM signBlob API.
 
-    When gcs_service_account_email is set (local dev with user ADC),
-    use the IAM signBlob API. Otherwise (Cloud Run), the default SA signs directly.
+    Compute Engine credentials (Cloud Run) cannot sign locally, so we always
+    use the IAM signBlob API.  The service account email is taken from the
+    config when set (local dev) or auto-detected from default credentials.
     """
     settings = get_settings()
-    if settings.gcs_service_account_email:
-        credentials, _ = google.auth.default()
+    credentials, _ = google.auth.default()
+    if hasattr(credentials, "refresh"):
         credentials.refresh(google.auth.transport.requests.Request())
-        return {
-            "service_account_email": settings.gcs_service_account_email,
-            "access_token": credentials.token,
-        }
-    return {}
+
+    sa_email = settings.gcs_service_account_email or getattr(
+        credentials, "service_account_email", ""
+    )
+    if not sa_email:
+        return {}
+
+    return {
+        "service_account_email": sa_email,
+        "access_token": credentials.token,
+    }
 
 
 def generate_upload_url(storage_path: str, content_type: str) -> str:

@@ -5,6 +5,7 @@
 
 const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 /** Get the current user's ID token, or null if not signed in. */
 async function getIdToken() {
