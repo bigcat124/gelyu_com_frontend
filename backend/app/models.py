@@ -90,6 +90,7 @@ class AlbumResponse(BaseModel):
 class AlbumDetailResponse(AlbumResponse):
     created_by: str
     is_admin: bool = False
+    can_write: bool = False
 
 
 class AlbumListResponse(BaseModel):

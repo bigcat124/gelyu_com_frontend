@@ -220,16 +220,19 @@ async function loadVault() {
         var content = document.createElement("div");
         content.className = "vault-detail-content";
 
-        // Admin controls
+        // Write access controls (create album)
         var heroBtn = document.getElementById("hero-create-btn");
+        if (data.access_level === "write") {
+            content.appendChild(renderCreateAlbumForm(slug, token));
+        } else {
+            heroBtn.style.display = "none";
+        }
+
+        // Admin-only controls (vault settings)
         if (data.is_admin) {
             var heroLink = document.getElementById("hero-settings-link");
             heroLink.href = "/vaults/" + slug + "/settings";
             heroLink.style.display = "";
-
-            content.appendChild(renderCreateAlbumForm(slug, token));
-        } else {
-            heroBtn.style.display = "none";
         }
 
         // Album grid

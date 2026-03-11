@@ -35,7 +35,7 @@ function showVaultState(stateId) {
 
 var _photos = [];
 var _currentPhotoIndex = -1;
-var _isAdmin = false;
+var _canWrite = false;
 var _token = null;
 var _slug = null;
 var _albumSlug = null;
@@ -82,7 +82,6 @@ async function loadAlbum() {
         if (!vaultRes.ok) throw new Error("Unexpected status: " + vaultRes.status);
 
         var vaultData = await vaultRes.json();
-        _isAdmin = vaultData.is_admin;
         _vaultName = vaultData.name;
 
         // 2. Fetch album detail
@@ -98,6 +97,7 @@ async function loadAlbum() {
         }
         if (!albumRes.ok) throw new Error("Album fetch failed");
         var albumData = await albumRes.json();
+        _canWrite = albumData.can_write;
 
         // 3. Fetch photos
         var photosRes = await fetch(
@@ -126,8 +126,8 @@ async function loadAlbum() {
             content.appendChild(desc);
         }
 
-        // Admin: upload button + upload area
-        if (_isAdmin) {
+        // Write access: upload button + upload area
+        if (_canWrite) {
             var uploadBtn = document.getElementById("hero-upload-btn");
             uploadBtn.style.display = "";
             content.appendChild(renderUploadArea());

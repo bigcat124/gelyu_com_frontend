@@ -10,7 +10,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 
 from app.access import get_user_access_level, get_vault_by_slug
-from app.auth import AuthenticatedUser, require_admin, require_allowlist
+from app.auth import AuthenticatedUser, require_allowlist
 from app.dependencies import get_firestore_client, get_settings
 from app.models import (
     AlbumDetailResponse,
@@ -41,17 +41,25 @@ ALLOWED_TYPES = ALLOWED_IMAGE_TYPES | ALLOWED_VIDEO_TYPES
 
 
 def _check_vault_access(db, slug: str, user: AuthenticatedUser):
-    """Verify vault exists and user has access. Returns (vault_doc_id, vault_data, is_admin)."""
+    """Verify vault exists and user has access. Returns (vault_doc_id, vault_data, is_admin, access_level)."""
     result = get_vault_by_slug(db, slug)
     if not result:
         raise HTTPException(status_code=404, detail="Vault not found.")
     doc_id, data = result
     is_user_admin = user.allowlist_data.get("role") == "admin"
-    if not is_user_admin:
+    if is_user_admin:
+        access_level = "write"
+    else:
         access_level = get_user_access_level(user.allowlist_data, doc_id)
         if not access_level:
             raise HTTPException(status_code=403, detail="You do not have access to this vault.")
-    return doc_id, data, is_user_admin
+    return doc_id, data, is_user_admin, access_level
+
+
+def _require_write(access_level: str):
+    """Raise 403 if the user does not have write access."""
+    if access_level != "write":
+        raise HTTPException(status_code=403, detail="Write access required.")
 
 
 def _get_album_in_vault(db, vault_doc_id: str, album_slug: str):
@@ -59,7 +67,7 @@ def _get_album_in_vault(db, vault_doc_id: str, album_slug: str):
     docs = (
         db.collection("albums")
         .where(filter=FieldFilter("slug", "==", album_slug))
-        .where(filter=FieldFilter("vaultIds", "array_contains", vault_doc_id))
+        .where(filter=FieldFilter("vaultId", "==", vault_doc_id))
         .limit(1)
         .get()
     )
@@ -89,11 +97,11 @@ async def list_albums(
 ):
     """List albums linked to this vault."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, _ = _check_vault_access(db, slug, user)
 
     album_docs = (
         db.collection("albums")
-        .where(filter=FieldFilter("vaultIds", "array_contains", vault_doc_id))
+        .where(filter=FieldFilter("vaultId", "==", vault_doc_id))
         .order_by("createdAt", direction=fs.Query.DESCENDING)
         .get()
     )
@@ -150,11 +158,12 @@ async def create_album(
     request: Request,
     slug: str,
     body: CreateAlbumRequest,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Create a new album in this vault. Admin only."""
+    """Create a new album in this vault. Requires write access."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
 
     album_slug = name_to_slug(body.title)
     if not album_slug:
@@ -164,7 +173,7 @@ async def create_album(
     existing = (
         db.collection("albums")
         .where(filter=FieldFilter("slug", "==", album_slug))
-        .where(filter=FieldFilter("vaultIds", "array_contains", vault_doc_id))
+        .where(filter=FieldFilter("vaultId", "==", vault_doc_id))
         .limit(1)
         .get()
     )
@@ -177,7 +186,7 @@ async def create_album(
             "title": body.title,
             "slug": album_slug,
             "description": body.description,
-            "vaultIds": [vault_doc_id],
+            "vaultId": vault_doc_id,
             "coverPhotoId": None,
             "createdAt": fs.SERVER_TIMESTAMP,
             "createdBy": user.email,
@@ -197,7 +206,7 @@ async def get_album(
 ):
     """Get album detail."""
     db = get_firestore_client()
-    vault_doc_id, _, is_admin = _check_vault_access(db, slug, user)
+    vault_doc_id, _, is_admin, access_level = _check_vault_access(db, slug, user)
     album_doc_id, album_data = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     cover_url = None
@@ -238,6 +247,7 @@ async def get_album(
         created_at=created_at.isoformat() if created_at else None,
         created_by=album_data.get("createdBy", ""),
         is_admin=is_admin,
+        can_write=access_level == "write",
     )
 
 
@@ -248,11 +258,12 @@ async def update_album(
     slug: str,
     album_slug: str,
     body: UpdateAlbumRequest,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Update album metadata. Admin only."""
+    """Update album metadata. Requires write access."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, album_data = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     updates = {}
@@ -266,7 +277,7 @@ async def update_album(
             existing = (
                 db.collection("albums")
                 .where(filter=FieldFilter("slug", "==", new_slug))
-                .where(filter=FieldFilter("vaultIds", "array_contains", vault_doc_id))
+                .where(filter=FieldFilter("vaultId", "==", vault_doc_id))
                 .limit(1)
                 .get()
             )
@@ -290,11 +301,12 @@ async def delete_album(
     request: Request,
     slug: str,
     album_slug: str,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Delete album, all photos, and storage blobs. Admin only."""
+    """Delete album, all photos, and storage blobs. Requires write access."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     # Delete all photos and their storage blobs
@@ -325,7 +337,7 @@ async def list_photos(
 ):
     """List photos in an album with signed thumbnail URLs."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, _ = _check_vault_access(db, slug, user)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     photo_docs = (
@@ -374,7 +386,7 @@ async def get_photo(
 ):
     """Get a single photo with signed original URL (for lightbox)."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, _ = _check_vault_access(db, slug, user)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     photo_doc = (
@@ -421,14 +433,15 @@ async def get_upload_url(
     slug: str,
     album_slug: str,
     content_type: str = Query(...),
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Generate signed upload URLs for a photo/video. Admin only."""
+    """Generate signed upload URLs for a photo/video. Requires write access."""
     if content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail=f"Unsupported content type: {content_type}")
 
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     is_video = content_type in ALLOWED_VIDEO_TYPES
@@ -464,14 +477,15 @@ async def confirm_upload(
     album_slug: str,
     photo_id: str = Query(...),
     body: ConfirmUploadRequest = ...,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Confirm a file upload and write metadata to Firestore. Admin only."""
+    """Confirm a file upload and write metadata to Firestore. Requires write access."""
     if body.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail=f"Unsupported content type: {body.content_type}")
 
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     is_video = body.content_type in ALLOWED_VIDEO_TYPES
@@ -522,11 +536,12 @@ async def update_photo(
     album_slug: str,
     photo_id: str,
     body: UpdatePhotoRequest,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Update photo caption. Admin only."""
+    """Update photo caption. Requires write access."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     photo_ref = (
@@ -549,11 +564,12 @@ async def delete_photo(
     slug: str,
     album_slug: str,
     photo_id: str,
-    user: AuthenticatedUser = Depends(require_admin),
+    user: AuthenticatedUser = Depends(require_allowlist),
 ):
-    """Delete a photo and its storage blobs. Admin only."""
+    """Delete a photo and its storage blobs. Requires write access."""
     db = get_firestore_client()
-    vault_doc_id, _, _ = _check_vault_access(db, slug, user)
+    vault_doc_id, _, _, access_level = _check_vault_access(db, slug, user)
+    _require_write(access_level)
     album_doc_id, _ = _get_album_in_vault(db, vault_doc_id, album_slug)
 
     photo_ref = (
