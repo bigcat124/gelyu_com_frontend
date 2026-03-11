@@ -1,11 +1,11 @@
 /**
- * Vault detail page: extract slug from URL, check auth, fetch vault detail.
+ * Vault detail page: show albums, admin create album.
+ * URL: /vaults/{slug}
  * Depends on auth.js and firebase-init.js being loaded first.
  */
 
 function getSlugFromPath() {
     var parts = window.location.pathname.split("/");
-    // parts = ["", "vault", "slug"]
     return parts[2] || null;
 }
 
@@ -20,6 +20,144 @@ function hideAllVaultStates() {
 function showVaultState(stateId) {
     hideAllVaultStates();
     document.getElementById(stateId).style.display = "block";
+}
+
+function renderAlbumList(albums, slug, container) {
+    if (albums.length === 0) {
+        var p = document.createElement("p");
+        p.className = "vault-content-placeholder";
+        p.textContent = "No albums yet.";
+        container.appendChild(p);
+        return;
+    }
+
+    var grid = document.createElement("div");
+    grid.className = "album-grid";
+
+    albums.forEach(function (album) {
+        var card = document.createElement("a");
+        card.href = "/vaults/" + slug + "/" + album.slug;
+        card.className = "album-card";
+
+        var imgContainer = document.createElement("div");
+        imgContainer.className = "album-card-cover";
+        if (album.cover_photo_url) {
+            var img = document.createElement("img");
+            img.src = album.cover_photo_url;
+            img.alt = album.title;
+            img.loading = "lazy";
+            imgContainer.appendChild(img);
+        } else {
+            imgContainer.className += " album-card-cover-empty";
+        }
+        card.appendChild(imgContainer);
+
+        var info = document.createElement("div");
+        info.className = "album-card-info";
+
+        var title = document.createElement("h4");
+        title.textContent = album.title;
+        info.appendChild(title);
+
+        if (album.description) {
+            var desc = document.createElement("p");
+            desc.textContent = album.description;
+            info.appendChild(desc);
+        }
+
+        var count = document.createElement("span");
+        count.className = "album-card-count";
+        count.textContent = album.photo_count + " photo" + (album.photo_count !== 1 ? "s" : "");
+        info.appendChild(count);
+
+        card.appendChild(info);
+        grid.appendChild(card);
+    });
+
+    container.appendChild(grid);
+}
+
+function renderCreateAlbumForm(slug, token) {
+    var form = document.createElement("div");
+    form.className = "admin-form";
+    form.style.display = "none";
+    form.innerHTML =
+        '<div class="form-group">' +
+            '<label for="album-title">Title</label>' +
+            '<input type="text" id="album-title" maxlength="100" placeholder="Album title">' +
+        '</div>' +
+        '<div class="form-group">' +
+            '<label for="album-desc">Description</label>' +
+            '<input type="text" id="album-desc" maxlength="1000" placeholder="Optional description">' +
+        '</div>' +
+        '<div class="form-actions">' +
+            '<button id="album-create-submit" class="btn-primary">Create</button>' +
+            '<button id="album-create-cancel" class="btn-secondary">Cancel</button>' +
+        '</div>' +
+        '<div id="album-create-message" class="form-message"></div>';
+
+    var heroBtn = document.getElementById("hero-create-btn");
+    heroBtn.style.display = "";
+    heroBtn.onclick = function () {
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    };
+
+    form.querySelector("#album-create-cancel").onclick = function () {
+        form.style.display = "none";
+        form.querySelector("#album-title").value = "";
+        form.querySelector("#album-desc").value = "";
+        form.querySelector("#album-create-message").textContent = "";
+    };
+
+    form.querySelector("#album-create-submit").onclick = async function () {
+        var titleVal = form.querySelector("#album-title").value.trim();
+        var descVal = form.querySelector("#album-desc").value.trim();
+        var msgEl = form.querySelector("#album-create-message");
+        msgEl.textContent = "";
+        msgEl.className = "form-message";
+
+        if (!titleVal) {
+            msgEl.textContent = "Title is required.";
+            msgEl.className = "form-message form-message-error";
+            return;
+        }
+
+        try {
+            var res = await fetch(
+                API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/albums",
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer " + token,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ title: titleVal, description: descVal }),
+                }
+            );
+
+            if (res.status === 409) {
+                msgEl.textContent = "An album with that title already exists.";
+                msgEl.className = "form-message form-message-error";
+                return;
+            }
+
+            if (!res.ok) {
+                var err = await res.json().catch(function () { return {}; });
+                msgEl.textContent = err.detail || "Failed to create album.";
+                msgEl.className = "form-message form-message-error";
+                return;
+            }
+
+            msgEl.textContent = "Album created.";
+            msgEl.className = "form-message form-message-success";
+            setTimeout(function () { loadVault(); }, 600);
+        } catch (e) {
+            msgEl.textContent = "Network error.";
+            msgEl.className = "form-message form-message-error";
+        }
+    };
+
+    return form;
 }
 
 async function loadVault() {
@@ -68,37 +206,42 @@ async function loadVault() {
         document.getElementById("vault-title").textContent = data.name;
         document.title = data.name + " - Vault - Ge Lyu";
 
-        // Populate content
+        // Fetch albums
+        var albumsRes = await fetch(
+            API_BASE + "/api/vaults/" + encodeURIComponent(slug) + "/albums",
+            { headers: { "Authorization": "Bearer " + token } }
+        );
+        var albumsData = albumsRes.ok ? await albumsRes.json() : { albums: [] };
+
+        // Build content
         var grantedEl = document.getElementById("vault-granted");
         grantedEl.textContent = "";
 
         var content = document.createElement("div");
         content.className = "vault-detail-content";
 
-        if (data.description) {
-            var desc = document.createElement("p");
-            desc.className = "vault-description";
-            desc.textContent = data.description;
-            content.appendChild(desc);
+        // Write access controls (create album)
+        var heroBtn = document.getElementById("hero-create-btn");
+        if (data.access_level === "write") {
+            content.appendChild(renderCreateAlbumForm(slug, token));
+        } else {
+            heroBtn.style.display = "none";
         }
 
-        // Placeholder content area
-        var contentArea = document.createElement("div");
-        contentArea.className = "vault-content-area";
-        contentArea.innerHTML =
-            '<p class="vault-content-placeholder">Content for this vault will appear here.</p>';
-        content.appendChild(contentArea);
-
-        // Admin: show settings link in hero banner
+        // Admin-only controls (vault settings)
         if (data.is_admin) {
             var heroLink = document.getElementById("hero-settings-link");
-            heroLink.href = "/vault/" + slug + "/settings";
+            heroLink.href = "/vaults/" + slug + "/settings";
             heroLink.style.display = "";
         }
 
+        // Album grid
+        renderAlbumList(albumsData.albums, slug, content);
+
+        // Back link
         var backLink = document.createElement("a");
-        backLink.href = "/vault.html";
-        backLink.textContent = "\u2190 Back to Vault";
+        backLink.href = "/vaults.html";
+        backLink.textContent = "\u2190 Back to Vaults";
         backLink.className = "back-link";
         content.appendChild(backLink);
 

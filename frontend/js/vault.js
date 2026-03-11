@@ -27,7 +27,7 @@ function renderVaultList(vaults, container) {
     list.className = "vault-list";
     vaults.forEach(function (v) {
         var card = document.createElement("a");
-        card.href = "/vault/" + v.slug;
+        card.href = "/vaults/" + v.slug;
         card.className = "vault-card";
 
         var name = document.createElement("h4");

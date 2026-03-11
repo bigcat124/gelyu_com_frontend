@@ -93,7 +93,7 @@ function renderNameSection(slug, name, token) {
             // If slug changed, redirect to new settings URL
             if (body.slug && body.slug !== slug) {
                 setTimeout(function () {
-                    window.location.href = "/vault/" + body.slug + "/settings";
+                    window.location.href = "/vaults/" + body.slug + "/settings";
                 }, 500);
             }
         } catch (e) {
@@ -328,7 +328,7 @@ async function loadSettings() {
         content.appendChild(renderAccessTable(slug, accessData.users, token));
 
         var backLink = document.createElement("a");
-        backLink.href = "/vault/" + slug;
+        backLink.href = "/vaults/" + slug;
         backLink.textContent = "\u2190 Back to Vault";
         backLink.className = "back-link";
         content.appendChild(backLink);

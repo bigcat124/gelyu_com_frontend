@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["http://localhost:5001", "https://www.gelyu.com", "https://gelyu.com"],
+    "method": ["PUT", "GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
